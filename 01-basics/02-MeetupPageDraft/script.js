@@ -44,23 +44,48 @@ const agendaItemIcons = {
   other: 'cal-sm',
 };
 
+const getDateOnlyString = (date) => {
+  const YYYY = date.getUTCFullYear();
+  const MM = (date.getUTCMonth() + 1).toString().padStart(2, '0')
+  const DD = date.getUTCDate().toString().padStart(2, '0')
+
+  return `${YYYY}-${MM}-${DD}`
+}
+
 export const app = new Vue({
   el: '#app',
 
-  data: {
-    //
+  data() {
+    return {
+      rawMeetup: {},
+      agendaItemTitles: agendaItemTitles,
+      agendaItemIcons: agendaItemIcons
+    }
   },
 
-  mounted() {
-    // Требуется получить данные митапа с API
+  async mounted() {
+    this.rawMeetup = await this.fetchMeetup(MEETUP_ID);
   },
 
   computed: {
-    //
+    meetup() {
+      return {
+        ...this.rawMeetup,
+        cover: this.rawMeetup.imageId ? getMeetupCoverLink(this.rawMeetup) : undefined,
+        date: new Date(this.rawMeetup.date),
+        localDate: new Date(this.rawMeetup.date).toLocaleString(navigator.language, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        }),
+        dateOnlyString: getDateOnlyString(new Date(this.rawMeetup.date))
+      }
+    }
   },
 
   methods: {
-    // Получение данных с API предпочтительнее оформить отдельным методом,
-    // а не писать прямо в mounted()
+    fetchMeetup(id) {
+      return fetch(`${API_URL}/meetups/${id}`).then((res) => res.json())
+    }
   },
 });
