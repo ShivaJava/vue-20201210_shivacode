@@ -1,14 +1,16 @@
 <template>
-  <div class="toasts">
-    <div class="toast toast_success">
-      <app-icon icon="check-circle" />
-      <span>Success</span>
+    <div class="toasts">
+      <template v-for="(message, index) in messages">
+        <div v-if="message.type === 'success'" :key="index" class="toast toast_success">
+          <app-icon icon="check-circle" />
+          <span>{{ message.text }}</span>
+        </div>
+        <div v-if="message.type === 'error'" :key="index" class="toast toast_error">
+          <app-icon icon="alert-circle" />
+          <span>{{ message.text }}</span>
+        </div>
+      </template>
     </div>
-    <div class="toast toast_error">
-      <app-icon icon="alert-circle" />
-      <span>Error</span>
-    </div>
-  </div>
 </template>
 
 <script>
@@ -18,13 +20,31 @@ const DELAY = 5000;
 
 export default {
   name: 'AppToast',
+  data: () => ({
+    messages: []
+  }),
+  mounted() {
+    // можно еще делать проверку и сбрасывать интервал, но это понятно и поэтому лень :)
+    setInterval(() => {
+      this.messages.splice(0, 1)
+    }, DELAY);
+  },
 
   components: { AppIcon },
 
   methods: {
-    error(message) {},
-
-    success(message) {},
+    error(message) {
+      this.messages.push({
+        type: 'error',
+        text: message
+      })
+    },
+    success(message) {
+      this.messages.push({
+        type: 'success',
+        text: message
+      });
+    },
   },
 };
 </script>

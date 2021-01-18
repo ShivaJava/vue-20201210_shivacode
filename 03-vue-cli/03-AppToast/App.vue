@@ -20,6 +20,10 @@ export default {
     return {};
   },
 
+  mounted() {
+    this.success()
+  },
+
   methods: {
     success() {
       this.$refs.toaster.success('Success ' + new Date().toLocaleTimeString());
